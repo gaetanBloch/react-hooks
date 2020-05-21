@@ -8,10 +8,6 @@ const Ingredients = () => {
 
   const [ingredients, setIngredients] = useState([]);
 
-  useEffect(() => {
-    console.log('Rendering ingredients', ingredients);
-  }, [ingredients]);
-
   const filerIngredientsHandler = useCallback(filteredIngredients => {
     setIngredients(filteredIngredients);
   }, []);
