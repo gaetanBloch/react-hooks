@@ -10,29 +10,37 @@ const Search = React.memo(props => {
   const filterRef = useRef();
 
   useEffect(() => {
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       if (filter === filterRef.current.value) {
-        const queryParams = filter.length === 0
-          ? ''
-          : `?orderBy="title"&equalTo="${filter}"`;
-        fetch(
-          `https://react-hooks-b09bb.firebaseio.com/ingredients.json${queryParams}`
-        ).then(response => {
-          return response.json();
-        }).then(responseJson => {
-          const loadedIngredients = [];
-          Object.keys(responseJson).forEach(key => {
-            loadedIngredients.push({
-              id: key,
-              title: responseJson[key].title,
-              amount: responseJson[key].amount
-            });
-          });
-          onLoadIngredients(loadedIngredients);
-        });
+        fetchFilteredIngredients();
       }
     }, 500);
+
+    return () => {
+      clearTimeout(timeout);
+    };
   }, [filter, onLoadIngredients, filterRef]);
+
+  const fetchFilteredIngredients = () => {
+    const queryParams = filter.length === 0
+      ? ''
+      : `?orderBy="title"&equalTo="${filter}"`;
+    fetch(
+      `https://react-hooks-b09bb.firebaseio.com/ingredients.json${queryParams}`
+    ).then(response => {
+      return response.json();
+    }).then(responseJson => {
+      const loadedIngredients = [];
+      Object.keys(responseJson).forEach(key => {
+        loadedIngredients.push({
+          id: key,
+          title: responseJson[key].title,
+          amount: responseJson[key].amount
+        });
+      });
+      onLoadIngredients(loadedIngredients);
+    });
+  };
 
   return (
     <section className="search">
