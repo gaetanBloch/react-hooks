@@ -7,12 +7,14 @@ import IngredientList from './IngredientList/IngredientList';
 const Ingredients = () => {
 
   const [ingredients, setIngredients] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const filerIngredientsHandler = useCallback(filteredIngredients => {
     setIngredients(filteredIngredients);
   }, []);
 
   const addIngredientHandler = ingredient => {
+    setLoading(true);
     fetch(
       'https://react-hooks-b09bb.firebaseio.com/ingredients.json',
       {
@@ -23,6 +25,7 @@ const Ingredients = () => {
     ).then(response => {
       return response.json();
     }).then(responseJson => {
+      setLoading(false);
       setIngredients(prevIngredients => prevIngredients.concat({
         id: responseJson.name,
         ...ingredient
@@ -43,7 +46,9 @@ const Ingredients = () => {
 
   return (
     <div className="App">
-      <IngredientForm onAddIngredient={addIngredientHandler} />
+      <IngredientForm
+        onAddIngredient={addIngredientHandler}
+        loading={loading} />
       <section>
         <Search onLoadIngredients={filerIngredientsHandler} />
         <IngredientList
