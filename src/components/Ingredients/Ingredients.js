@@ -9,10 +9,21 @@ const Ingredients = () => {
   const [ingredients, setIngredients] = useState([]);
 
   const addIngredientHandler = ingredient => {
-    setIngredients(prevIngredients => prevIngredients.concat({
-      id: Math.random().toString(),
-      ...ingredient
-    }));
+    fetch(
+      'https://react-hooks-b09bb.firebaseio.com/ingredients.json',
+      {
+        method: 'POST',
+        body: JSON.stringify(ingredient),
+        header: { 'Content-Type': 'application/json' }
+      }
+    ).then(response => {
+      return response.json();
+    }).then(responseJson => {
+      setIngredients(prevIngredients => prevIngredients.concat({
+        id: responseJson.name,
+        ...ingredient
+      }));
+    });
   };
 
   const removeIngredientHandler = id => {
@@ -24,7 +35,6 @@ const Ingredients = () => {
   return (
     <div className="App">
       <IngredientForm onAddIngredient={addIngredientHandler} />
-
       <section>
         <Search />
         <IngredientList
