@@ -10,10 +10,14 @@ const Search = React.memo(props => {
   const [filter, setFilter] = useState('');
 
   useEffect(() => {
-    fetch('https://react-hooks-b09bb.firebaseio.com/ingredients.json')
-      .then(response => {
-        return response.json();
-      }).then(responseJson => {
+    const queryParams = filter.length === 0
+      ? ''
+      : `orderBy="title"&equalTo="${filter}"`;
+    fetch(
+      `https://react-hooks-b09bb.firebaseio.com/ingredients.json${queryParams}`
+    ).then(response => {
+      return response.json();
+    }).then(responseJson => {
       const loadedIngredients = [];
       Object.keys(responseJson).forEach(key => {
         loadedIngredients.push({
@@ -22,7 +26,7 @@ const Search = React.memo(props => {
           amount: responseJson[key].amount
         });
       });
-      onLoadIngredients(loadedIngredients);
+      // onLoadIngredients(loadedIngredients);
     });
   }, [filter, onLoadIngredients]);
 
