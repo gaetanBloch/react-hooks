@@ -52,6 +52,7 @@ const Ingredients = () => {
 
   const clearErrorHandler = () => {
     setError(null);
+    setLoading(false);
   }
 
   return (
