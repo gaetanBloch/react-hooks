@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import IngredientForm from './IngredientForms/IngredientForm';
 import Search from '../Search/Search';
@@ -49,12 +49,12 @@ const Ingredients = () => {
   };
 
   const setDefaultErrorMessage = () => {
+    setLoading(false);
     setError('An unexpected error occurred!');
   }
 
   const clearErrorHandler = () => {
     setError(null);
-    setLoading(false);
   }
 
   return (
