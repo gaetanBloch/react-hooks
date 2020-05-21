@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import Card from '../UI/Card/Card';
 import './Search.css';
@@ -9,19 +9,7 @@ const Search = React.memo(props => {
   const [filter, setFilter] = useState('');
   const filterRef = useRef();
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (filter === filterRef.current.value) {
-        fetchFilteredIngredients();
-      }
-    }, 500);
-
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [filter, onLoadIngredients, filterRef]);
-
-  const fetchFilteredIngredients = () => {
+  const fetchFilteredIngredients = useCallback(() => {
     const queryParams = filter.length === 0
       ? ''
       : `?orderBy="title"&equalTo="${filter}"`;
@@ -40,7 +28,19 @@ const Search = React.memo(props => {
       });
       onLoadIngredients(loadedIngredients);
     });
-  };
+  }, [filter, onLoadIngredients]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (filter === filterRef.current.value) {
+        fetchFilteredIngredients();
+      }
+    }, 500);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [filter, filterRef, fetchFilteredIngredients]);
 
   return (
     <section className="search">
