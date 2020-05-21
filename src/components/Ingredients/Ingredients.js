@@ -93,9 +93,9 @@ const Ingredients = () => {
     dispatchHttp({ type: ERROR, error: 'An unexpected error occurred!' });
   };
 
-  const clearErrorHandler = () => {
+  const clearErrorHandler = useCallback(() => {
     dispatchHttp({ type: CLEAR_ERROR });
-  };
+  }, []);
 
   const ingredientList = useMemo(() => {
     return <IngredientList
