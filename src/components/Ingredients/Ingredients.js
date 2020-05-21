@@ -20,10 +20,14 @@ const Ingredients = () => {
           title: responseJson[key].title,
           amount: responseJson[key].amount
         });
-      })
+      });
       setIngredients(loadedIngredients);
     });
   }, []);
+
+  useEffect(() => {
+    console.log('Rendering ingredients', ingredients);
+  }, [ingredients]);
 
   const addIngredientHandler = ingredient => {
     fetch(
