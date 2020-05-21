@@ -12,7 +12,7 @@ const Search = React.memo(props => {
   useEffect(() => {
     const queryParams = filter.length === 0
       ? ''
-      : `orderBy="title"&equalTo="${filter}"`;
+      : `?orderBy="title"&equalTo="${filter}"`;
     fetch(
       `https://react-hooks-b09bb.firebaseio.com/ingredients.json${queryParams}`
     ).then(response => {
@@ -26,7 +26,7 @@ const Search = React.memo(props => {
           amount: responseJson[key].amount
         });
       });
-      // onLoadIngredients(loadedIngredients);
+      onLoadIngredients(loadedIngredients);
     });
   }, [filter, onLoadIngredients]);
 
