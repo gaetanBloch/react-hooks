@@ -9,7 +9,7 @@ const Ingredients = () => {
 
   const [ingredients, setIngredients] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState();
+  const [error, setError] = useState(null);
 
   const filerIngredientsHandler = useCallback(filteredIngredients => {
     setIngredients(filteredIngredients);
@@ -32,13 +32,15 @@ const Ingredients = () => {
         id: responseJson.name,
         ...ingredient
       }));
+    }).catch(() => {
+      setError('An unexpected error occurred!');
     });
   };
 
   const removeIngredientHandler = id => {
     setLoading(true);
     fetch(
-      `https://react-hooks-b09bb.firebaseio.com/ingredients/${id}.jon`,
+      `https://react-hooks-b09bb.firebaseio.com/ingredients/${id}.json`,
       { method: 'DELETE' }
     ).then(() => {
       setLoading(false);
