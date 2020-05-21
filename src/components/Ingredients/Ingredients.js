@@ -32,9 +32,7 @@ const Ingredients = () => {
         id: responseJson.name,
         ...ingredient
       }));
-    }).catch(() => {
-      setError('An unexpected error occurred!');
-    });
+    }).catch(setDefaultErrorMessage);
   };
 
   const removeIngredientHandler = id => {
@@ -47,10 +45,12 @@ const Ingredients = () => {
       setIngredients(preIngredients => preIngredients.filter(ingredient => {
         return ingredient.id !== id;
       }));
-    }).catch(error => {
-      setError(error.message);
-    });
+    }).catch(setDefaultErrorMessage);
   };
+
+  const setDefaultErrorMessage = () => {
+    setError('An unexpected error occurred!');
+  }
 
   const clearErrorHandler = () => {
     setError(null);
