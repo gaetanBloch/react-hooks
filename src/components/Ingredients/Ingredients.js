@@ -1,18 +1,37 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useReducer, useState } from 'react';
 
 import IngredientForm from './IngredientForms/IngredientForm';
 import Search from '../Search/Search';
 import IngredientList from './IngredientList/IngredientList';
 import ErrorModal from '../UI/ErrorModal/ErrorModal';
 
+const SET = 'SET';
+const ADD = 'ADD';
+const DELETE = 'DELETE';
+
+const ingredientReducer = (ingredients, action) => {
+  switch (action.type) {
+    case SET:
+      return action.ingredients;
+    case ADD:
+      return ingredients.concat(action.ingredient);
+    case DELETE:
+      return ingredients.filter(ingredient => ingredient.id !== action.id);
+    default:
+      throw new Error('Should never happen');
+  }
+};
+
 const Ingredients = () => {
 
-  const [ingredients, setIngredients] = useState([]);
+  const [ingredients, dispatch] = useReducer(ingredientReducer, [], undefined);
+
+  // const [ingredients, setIngredients] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const filerIngredientsHandler = useCallback(filteredIngredients => {
-    setIngredients(filteredIngredients);
+    dispatch({ type: SET, ingredients: filteredIngredients });
   }, []);
 
   const addIngredientHandler = ingredient => {
@@ -28,10 +47,9 @@ const Ingredients = () => {
       return response.json();
     }).then(responseJson => {
       setLoading(false);
-      setIngredients(prevIngredients => prevIngredients.concat({
-        id: responseJson.name,
-        ...ingredient
-      }));
+      dispatch({
+        type: ADD, ingredient: { id: responseJson.name, ...ingredient }
+      });
     }).catch(setDefaultErrorMessage);
   };
 
@@ -42,20 +60,18 @@ const Ingredients = () => {
       { method: 'DELETE' }
     ).then(() => {
       setLoading(false);
-      setIngredients(preIngredients => preIngredients.filter(ingredient => {
-        return ingredient.id !== id;
-      }));
+      dispatch({ type: DELETE, id });
     }).catch(setDefaultErrorMessage);
   };
 
   const setDefaultErrorMessage = () => {
     setLoading(false);
     setError('An unexpected error occurred!');
-  }
+  };
 
   const clearErrorHandler = () => {
     setError(null);
-  }
+  };
 
   return (
     <div className="App">
