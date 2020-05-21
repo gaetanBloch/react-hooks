@@ -5,6 +5,8 @@ import './Search.css';
 
 const Search = React.memo(props => {
 
+  const { onLoadIngredients } = props;
+
   const [filter, setFilter] = useState('');
 
   useEffect(() => {
@@ -20,9 +22,9 @@ const Search = React.memo(props => {
           amount: responseJson[key].amount
         });
       });
-      props.onLoadIngredients(loadedIngredients);
+      onLoadIngredients(loadedIngredients);
     });
-  }, [filter])
+  }, [filter, onLoadIngredients]);
 
   return (
     <section className="search">
