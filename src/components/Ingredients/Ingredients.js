@@ -78,7 +78,7 @@ const Ingredients = () => {
     }).catch(setDefaultErrorMessage);
   }, []);
 
-  const removeIngredientHandler = id => {
+  const removeIngredientHandler = useCallback(id => {
     dispatchHttp({ type: SEND });
     fetch(
       `https://react-hooks-b09bb.firebaseio.com/ingredients/${id}.json`,
@@ -87,7 +87,7 @@ const Ingredients = () => {
       dispatchHttp({ type: RESPONSE });
       dispatchIngredients({ type: DELETE, id });
     }).catch(setDefaultErrorMessage);
-  };
+  }, []);
 
   const setDefaultErrorMessage = () => {
     dispatchHttp({ type: ERROR, error: 'An unexpected error occurred!' });
