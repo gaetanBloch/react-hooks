@@ -20,6 +20,7 @@ const Search = React.memo(props => {
           amount: responseJson[key].amount
         });
       });
+      props.onLoadIngredients(loadedIngredients);
     });
   }, [filter])
 
