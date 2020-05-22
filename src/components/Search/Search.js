@@ -2,33 +2,24 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import Card from '../UI/Card/Card';
 import './Search.css';
+import useHttp from '../../hooks/http';
 
 const Search = React.memo(props => {
 
   const { onLoadIngredients } = props;
   const [filter, setFilter] = useState('');
   const filterRef = useRef();
+  const { httpState, sendRequest } = useHttp();
 
   const fetchFilteredIngredients = useCallback(() => {
     const queryParams = filter.length === 0
       ? ''
       : `?orderBy="title"&equalTo="${filter}"`;
-    fetch(
-      `https://react-hooks-b09bb.firebaseio.com/ingredients.json${queryParams}`
-    ).then(response => {
-      return response.json();
-    }).then(responseJson => {
-      const loadedIngredients = [];
-      Object.keys(responseJson).forEach(key => {
-        loadedIngredients.push({
-          id: key,
-          title: responseJson[key].title,
-          amount: responseJson[key].amount
-        });
-      });
-      onLoadIngredients(loadedIngredients);
-    });
-  }, [filter, onLoadIngredients]);
+    sendRequest(
+      `https://react-hooks-b09bb.firebaseio.com/ingredients.json${queryParams}`,
+      'GET'
+    );
+  }, [filter, sendRequest]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -41,6 +32,20 @@ const Search = React.memo(props => {
       clearTimeout(timeout);
     };
   }, [filter, filterRef, fetchFilteredIngredients]);
+
+  useEffect(() => {
+    if (!httpState.loading && httpState.data) {
+      const loadedIngredients = [];
+      Object.keys(httpState.data).forEach(key => {
+        loadedIngredients.push({
+          id: key,
+          title: httpState.data[key].title,
+          amount: httpState.data[key].amount
+        });
+      });
+      onLoadIngredients(loadedIngredients);
+    }
+  }, [httpState.loading, httpState.data, onLoadIngredients]);
 
   return (
     <section className="search">
