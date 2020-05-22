@@ -5,6 +5,14 @@ const RESPONSE = 'RESPONSE';
 const ERROR = 'ERROR';
 const CLEAR_ERROR = 'CLEAR_ERROR';
 
+const initialState = {
+  loading: false,
+  data: null,
+  error: null,
+  extra: null,
+  identifier: null
+};
+
 const httpReducer = (httpState, action) => {
   switch (action.type) {
     case SEND:
@@ -30,10 +38,7 @@ const httpReducer = (httpState, action) => {
         error: action.error
       };
     case CLEAR_ERROR:
-      return {
-        ...httpState,
-        error: null
-      };
+      return initialState;
     default:
       throw new Error('Should never happen!');
   }
@@ -42,9 +47,13 @@ const httpReducer = (httpState, action) => {
 const useHttp = () => {
   const [httpState, dispatchHttp] = useReducer(
     httpReducer,
-    { loading: false, data: null, error: null, extra: null, identifier: null },
+    initialState,
     undefined
   );
+
+  const clearError = useCallback(() => {
+    dispatchHttp({ type: CLEAR_ERROR });
+  }, []);
 
   const sendRequest = useCallback((url, method, body, extra, identifier) => {
     dispatchHttp({ type: SEND, identifier });
@@ -66,7 +75,8 @@ const useHttp = () => {
       extra: httpState.extra,
       identifier: httpState.identifier
     },
-    sendRequest
+    sendRequest,
+    clearError
   };
 };
 
