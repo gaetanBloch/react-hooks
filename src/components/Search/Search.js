@@ -3,13 +3,14 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Card from '../UI/Card/Card';
 import './Search.css';
 import useHttp from '../../hooks/http';
+import ErrorModal from '../UI/ErrorModal/ErrorModal';
 
 const Search = React.memo(props => {
 
   const { onLoadIngredients } = props;
   const [filter, setFilter] = useState('');
   const filterRef = useRef();
-  const { httpState, sendRequest } = useHttp();
+  const { httpState, sendRequest, clearError } = useHttp();
 
   const fetchFilteredIngredients = useCallback(() => {
     const queryParams = filter.length === 0
@@ -34,7 +35,7 @@ const Search = React.memo(props => {
   }, [filter, filterRef, fetchFilteredIngredients]);
 
   useEffect(() => {
-    if (!httpState.loading && httpState.data) {
+    if (!httpState.loading && !httpState.error && httpState.data) {
       const loadedIngredients = [];
       Object.keys(httpState.data).forEach(key => {
         loadedIngredients.push({
@@ -45,10 +46,16 @@ const Search = React.memo(props => {
       });
       onLoadIngredients(loadedIngredients);
     }
-  }, [httpState.loading, httpState.data, onLoadIngredients]);
+  }, [httpState.loading, httpState.data, httpState.error, onLoadIngredients]);
 
   return (
     <section className="search">
+
+      {
+        httpState.error &&
+        <ErrorModal onClose={clearError}>{httpState.error}</ErrorModal>
+      }
+
       <Card>
         <div className="search-input">
           <label>Filter by Title</label>

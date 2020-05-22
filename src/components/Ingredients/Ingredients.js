@@ -86,7 +86,7 @@ const Ingredients = () => {
   }, [ingredients, removeIngredientHandler]);
 
   return (
-    <div className="App">
+    <div>
 
       {
         httpState.error &&
