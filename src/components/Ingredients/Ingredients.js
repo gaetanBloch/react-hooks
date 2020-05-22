@@ -58,7 +58,12 @@ const Ingredients = () => {
     //     type: ADD, ingredient: { id: responseJson.name, ...ingredient }
     //   });
     // }).catch(setDefaultErrorMessage);
-  }, []);
+    sendRequest(
+      'https://react-hooks-b09bb.firebaseio.com/ingredients.json',
+      'POST',
+      JSON.stringify(ingredient)
+    );
+  }, [sendRequest]);
 
   const removeIngredientHandler = useCallback(id => {
     // dispatchHttp({ type: SEND });
