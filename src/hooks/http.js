@@ -8,7 +8,7 @@ const CLEAR_ERROR = 'CLEAR_ERROR';
 const httpReducer = (httpState, action) => {
   switch (action.type) {
     case SEND:
-      return { ...httpState, loading: true, error: null, data: null };
+      return { loading: true, error: null, data: null, extra: action.extra };
     case RESPONSE:
       return { ...httpState, loading: false, data: action.data };
     case ERROR:
@@ -23,12 +23,12 @@ const httpReducer = (httpState, action) => {
 const useHttp = () => {
   const [httpState, dispatchHttp] = useReducer(
     httpReducer,
-    { loading: false, data: null, error: null },
+    { loading: false, data: null, error: null, extra: null },
     undefined
   );
 
-  const sendRequest = useCallback((url, method, body) => {
-    dispatchHttp({ type: SEND });
+  const sendRequest = useCallback((url, method, body, reqExtra) => {
+    dispatchHttp({ type: SEND , extra: reqExtra});
     fetch(url, { method, body, header: { 'Content-Type': 'application/json' } })
       .then(response => response.json())
       .then(responseData => {
@@ -44,6 +44,7 @@ const useHttp = () => {
       loading: httpState.loading,
       data: httpState.data,
       error: httpState.error,
+      extra: httpState.extra
     },
     sendRequest
   };

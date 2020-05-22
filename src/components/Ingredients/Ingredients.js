@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useReducer } from 'react';
+import React, { useCallback, useEffect, useMemo, useReducer } from 'react';
 
 import IngredientForm from './IngredientForms/IngredientForm';
 import Search from '../Search/Search';
@@ -32,6 +32,10 @@ const Ingredients = () => {
   );
 
   const { httpState, sendRequest } = useHttp();
+
+  useEffect(() => {
+    dispatchIngredients({type: 'DELETE', id: httpState.extra})
+  }, [httpState.data, httpState.extra])
 
   const filerIngredientsHandler = useCallback(filteredIngredients => {
     dispatchIngredients({ type: SET, ingredients: filteredIngredients });
@@ -67,7 +71,9 @@ const Ingredients = () => {
     // }).catch(setDefaultErrorMessage);
     sendRequest(
       `https://react-hooks-b09bb.firebaseio.com/ingredients/${id}.json`,
-      'DELETE'
+      'DELETE',
+      null,
+      id
     );
   }, [sendRequest]);
 
