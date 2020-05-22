@@ -10,6 +10,9 @@ const SET = 'SET';
 const ADD = 'ADD';
 const DELETE = 'DELETE';
 
+const ADD_INGREDIENT = 'ADD_INGREDIENT';
+const REMOVE_INGREDIENT = 'REMOVE_INGREDIENT';
+
 const ingredientReducer = (ingredientsState, action) => {
   switch (action.type) {
     case SET:
@@ -34,57 +37,47 @@ const Ingredients = () => {
   const { httpState, sendRequest } = useHttp();
 
   useEffect(() => {
-    dispatchIngredients({type: 'DELETE', id: httpState.extra})
-  }, [httpState.data, httpState.extra])
+    if (!httpState.loading && !httpState.error) {
+      if (httpState.identifier === REMOVE_INGREDIENT) {
+        dispatchIngredients({ type: DELETE, id: httpState.extra });
+      } else if (httpState.identifier === ADD_INGREDIENT) {
+        dispatchIngredients({
+          type: ADD,
+          ingredient: { id: httpState.data.name, ...httpState.extra }
+        });
+      }
+    }
+  }, [
+    httpState.loading,
+    httpState.error,
+    httpState.identifier,
+    httpState.extra,
+    httpState.data
+  ]);
 
   const filerIngredientsHandler = useCallback(filteredIngredients => {
     dispatchIngredients({ type: SET, ingredients: filteredIngredients });
   }, []);
 
   const addIngredientHandler = useCallback(ingredient => {
-    // dispatchHttp({ type: SEND });
-    // fetch(
-    //   'https://react-hooks-b09bb.firebaseio.com/ingredients.json',
-    //   {
-    //     method: 'POST',
-    //     body: JSON.stringify(ingredient),
-    //     header: { 'Content-Type': 'application/json' }
-    //   }
-    // ).then(response => {
-    //   return response.json();
-    // }).then(responseJson => {
-    //   dispatchHttp({ type: RESPONSE });
-    //   dispatchIngredients({
-    //     type: ADD, ingredient: { id: responseJson.name, ...ingredient }
-    //   });
-    // }).catch(setDefaultErrorMessage);
     sendRequest(
       'https://react-hooks-b09bb.firebaseio.com/ingredients.json',
       'POST',
-      JSON.stringify(ingredient)
+      JSON.stringify(ingredient),
+      ingredient,
+      ADD_INGREDIENT
     );
   }, [sendRequest]);
 
   const removeIngredientHandler = useCallback(id => {
-    // dispatchHttp({ type: SEND });
-    // fetch(
-    //   `https://react-hooks-b09bb.firebaseio.com/ingredients/${id}.json`,
-    //   { method: 'DELETE' }
-    // ).then(() => {
-    //   dispatchHttp({ type: RESPONSE });
-    //   dispatchIngredients({ type: DELETE, id });
-    // }).catch(setDefaultErrorMessage);
     sendRequest(
       `https://react-hooks-b09bb.firebaseio.com/ingredients/${id}.json`,
       'DELETE',
       null,
-      id
+      id,
+      REMOVE_INGREDIENT
     );
   }, [sendRequest]);
-
-  const setDefaultErrorMessage = () => {
-    // dispatchHttp({ type: ERROR, error: 'An unexpected error occurred!' });
-  };
 
   const clearErrorHandler = useCallback(() => {
     // dispatchHttp({ type: CLEAR_ERROR });
