@@ -4,15 +4,11 @@ import IngredientForm from './IngredientForms/IngredientForm';
 import Search from '../Search/Search';
 import IngredientList from './IngredientList/IngredientList';
 import ErrorModal from '../UI/ErrorModal/ErrorModal';
+import useHttp from '../../hooks/http';
 
 const SET = 'SET';
 const ADD = 'ADD';
 const DELETE = 'DELETE';
-
-const SEND = 'SEND';
-const RESPONSE = 'RESPONSE';
-const ERROR = 'ERROR';
-const CLEAR_ERROR = 'CLEAR_ERROR';
 
 const ingredientReducer = (ingredientsState, action) => {
   switch (action.type) {
@@ -27,21 +23,6 @@ const ingredientReducer = (ingredientsState, action) => {
   }
 };
 
-const httpReducer = (httpState, action) => {
-  switch (action.type) {
-    case SEND:
-      return { ...httpState, loading: true, error: null };
-    case RESPONSE:
-      return { ...httpState, loading: false };
-    case ERROR:
-      return { ...httpState, loading: false, error: action.error };
-    case CLEAR_ERROR:
-      return { ...httpState, error: null };
-    default:
-      throw new Error('Should never happen!');
-  }
-};
-
 const Ingredients = () => {
 
   const [ingredients, dispatchIngredients] = useReducer(
@@ -49,59 +30,60 @@ const Ingredients = () => {
     [],
     undefined
   );
-  const [httpState, dispatchHttp] = useReducer(
-    httpReducer,
-    { loading: false, error: null },
-    undefined
-  );
+
+  const { httpState, sendRequest } = useHttp();
 
   const filerIngredientsHandler = useCallback(filteredIngredients => {
     dispatchIngredients({ type: SET, ingredients: filteredIngredients });
   }, []);
 
   const addIngredientHandler = useCallback(ingredient => {
-    dispatchHttp({ type: SEND });
-    fetch(
-      'https://react-hooks-b09bb.firebaseio.com/ingredients.json',
-      {
-        method: 'POST',
-        body: JSON.stringify(ingredient),
-        header: { 'Content-Type': 'application/json' }
-      }
-    ).then(response => {
-      return response.json();
-    }).then(responseJson => {
-      dispatchHttp({ type: RESPONSE });
-      dispatchIngredients({
-        type: ADD, ingredient: { id: responseJson.name, ...ingredient }
-      });
-    }).catch(setDefaultErrorMessage);
+    // dispatchHttp({ type: SEND });
+    // fetch(
+    //   'https://react-hooks-b09bb.firebaseio.com/ingredients.json',
+    //   {
+    //     method: 'POST',
+    //     body: JSON.stringify(ingredient),
+    //     header: { 'Content-Type': 'application/json' }
+    //   }
+    // ).then(response => {
+    //   return response.json();
+    // }).then(responseJson => {
+    //   dispatchHttp({ type: RESPONSE });
+    //   dispatchIngredients({
+    //     type: ADD, ingredient: { id: responseJson.name, ...ingredient }
+    //   });
+    // }).catch(setDefaultErrorMessage);
   }, []);
 
   const removeIngredientHandler = useCallback(id => {
-    dispatchHttp({ type: SEND });
-    fetch(
+    // dispatchHttp({ type: SEND });
+    // fetch(
+    //   `https://react-hooks-b09bb.firebaseio.com/ingredients/${id}.json`,
+    //   { method: 'DELETE' }
+    // ).then(() => {
+    //   dispatchHttp({ type: RESPONSE });
+    //   dispatchIngredients({ type: DELETE, id });
+    // }).catch(setDefaultErrorMessage);
+    sendRequest(
       `https://react-hooks-b09bb.firebaseio.com/ingredients/${id}.json`,
-      { method: 'DELETE' }
-    ).then(() => {
-      dispatchHttp({ type: RESPONSE });
-      dispatchIngredients({ type: DELETE, id });
-    }).catch(setDefaultErrorMessage);
-  }, []);
+      'DELETE'
+    );
+  }, [sendRequest]);
 
   const setDefaultErrorMessage = () => {
-    dispatchHttp({ type: ERROR, error: 'An unexpected error occurred!' });
+    // dispatchHttp({ type: ERROR, error: 'An unexpected error occurred!' });
   };
 
   const clearErrorHandler = useCallback(() => {
-    dispatchHttp({ type: CLEAR_ERROR });
+    // dispatchHttp({ type: CLEAR_ERROR });
   }, []);
 
   const ingredientList = useMemo(() => {
     return <IngredientList
       ingredients={ingredients}
-      onRemoveItem={removeIngredientHandler} />
-  }, [ingredients, removeIngredientHandler])
+      onRemoveItem={removeIngredientHandler} />;
+  }, [ingredients, removeIngredientHandler]);
 
   return (
     <div className="App">
